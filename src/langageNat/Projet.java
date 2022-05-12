@@ -2,19 +2,17 @@ package langageNat;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
+//import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class Projet {
 	/*
 	 * 1. Parcourir le fichier du premier mot et stocker les relations r_isa (id = 6) dans une liste
 	 * 2. Parcourir le fichier du deuxième mot et regarder lesquels sont en commun
-	 *
-	 * 
 	 */
 	
 	// Récupère le fichier csv des relations du mot indiqué dans l'ordinateur
@@ -33,139 +31,9 @@ public class Projet {
 	}
 	
 	
-	// Met les infos du fichier csv rentré en paramètre dans un tableau
-	public static String[][] putRelationsInArray(File f){
-		Scanner sc = null;
-		try {
-			sc = new Scanner(f);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    sc.useDelimiter(";");
-	   
-        //Initialise un compteur de lignes
-	    int compteurLigne = 0;
-        
-	    
-        int nbLigne = 0;
-        while(sc.hasNextLine()) {
-        	nbLigne++;
-        }
-        
-        final int nbColonnes = 6;
-        
-        
-        // Initialise un tableau pour mettre les infos qui nous interressent
-        String[][] infosRelationMot = new String[nbLigne][nbColonnes];
-	    
-        while(sc.hasNextLine()) {
-	    	String csvLigne = sc.nextLine();
-	    	
-	    	if (!csvLigne.isEmpty()) {
-	    		// Initialise un scanner pour interpréter la ligne.
-                Scanner ligneScan = new Scanner(csvLigne);
-                ligneScan.useDelimiter(";");
-             
-                
-                // Lis chaque champ de la ligne
-                String relation = ligneScan.next().trim();
-                String rid = ligneScan.next().trim();
-                String node1 = ligneScan.next().trim();
-                String node2 = ligneScan.next().trim();
-                String type = ligneScan.next().trim();
-                String w = ligneScan.next().trim();
-                
-                // Rentre les infos dans un tableau
-                infosRelationMot[compteurLigne][0] = relation;
-                infosRelationMot[compteurLigne][1] = rid;
-                infosRelationMot[compteurLigne][2] = node1;
-                infosRelationMot[compteurLigne][3] = node2;
-                infosRelationMot[compteurLigne][4] = type;
-                infosRelationMot[compteurLigne][5] = w;
-                
-                
-                compteurLigne++;
-                
-                
-                ligneScan.close();
-                          
-	    	}
-	    	
-	    }
-        
-	    sc.close();
-	    
-	    return infosRelationMot;
-	}
-	
-	// Met les infos du fichier csv rentré en paramètre dans un tableau
-	public static String[][] putMotsInArray(File f){
-		Scanner sc = null;
-		try {
-			sc = new Scanner(f);			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    sc.useDelimiter(";");
-		   
-	    //Initialise un compteur de lignes
-	    int compteurLigne = 0;
-	        	    
-	    int nbLigne = 0;
-	    while(sc.hasNextLine()) {
-        	nbLigne++;
-        }
-	        
-	    final int nbColonnes = 6;
-	        
-	        
-        // Initialise un tableau pour mettre les infos qui nous interressent
-	    String[][] infosMot = new String[nbLigne][nbColonnes];
-		    
-	    while(sc.hasNextLine()) {
-	    	String csvLigne = sc.nextLine();
-	    	
-		   	if (!csvLigne.isEmpty()) {
-		   		// Initialise un scanner pour interpréter la ligne.
-		   		Scanner ligneScan = new Scanner(csvLigne);
-		   		ligneScan.useDelimiter(";");
-	             
-	                
-	            // Lis chaque champ de la ligne
-	            String element = ligneScan.next().trim();
-	            String eid = ligneScan.next().trim();
-	            String name = ligneScan.next().trim();
-	            String type = ligneScan.next().trim();
-	            String w = ligneScan.next().trim();
-	            String formatedname = ligneScan.next().trim();
-	                
-	            // Rentre les infos dans un tableau
-	            infosMot[compteurLigne][0] = element;
-	            infosMot[compteurLigne][1] = eid;
-	            infosMot[compteurLigne][2] = name;
-	            infosMot[compteurLigne][3] = type;
-	            infosMot[compteurLigne][4] = w;
-	            infosMot[compteurLigne][5] = formatedname;
-	                
-	                
-	            compteurLigne++;
-	                
-	                
-	            ligneScan.close();
-	                	          
-		    }
-		   	
-	    }
-	        
-	    sc.close();
-		    
-	    return infosMot;
-	}
 		
-	// Prend un fichier et met l'id du mot et e la relation dans un tableau
-	public static ArrayList<String> tri(File f) throws IOException{
+	// Prend le fichier relation du mot 1 et met l'id du mot et de la relation dans un tableau
+	public static ArrayList<String> tri1(File f, String id) throws IOException{
 		ArrayList<String> al = new ArrayList<String>();
 		
 		//Met l'id du mot et le numéro de la relation dans un tableau
@@ -175,11 +43,19 @@ public class Projet {
 	    {
 	        String[] dataArray1 = dataRow.split(";");
 	        
-	        String node2 = dataArray1[3];
-        	String type = dataArray1[4];
-        	
-        	al.add(node2);
-        	al.add(type);
+	        //Si la 4ème colonne ne contient pas le mot 1
+	        if(!dataArray1[3].equals(id)) {
+	        	String node2 = dataArray1[3];
+	        	String type = dataArray1[4];
+	        	
+	        	//Même si le tableau contient déjà le mot c'est pas grave parce qu'il peut avoir une relation différente
+	        	
+	        	//if(!al.contains(node2)) { 
+	            	al.add(node2);
+	            	al.add(type);
+	        	//}
+	        }
+	        
 	        
         	/*for (String item1:dataArray1)
 	        {
@@ -197,12 +73,49 @@ public class Projet {
 		
 	}
 	
-	// Compare les 2 fichiers et donne la liste des id des mots et du type de relation
+	// Prend le fichier relation du mot 2 et met l'id du mot et de la relation dans un tableau
+		public static ArrayList<String> tri2(File f, String id) throws IOException{
+			ArrayList<String> al = new ArrayList<String>();
+			
+			//Met l'id du mot et le numéro de la relation dans un tableau
+		    BufferedReader CSVFile = new BufferedReader(new FileReader(f));
+		    String dataRow = CSVFile.readLine();
+		    while (dataRow != null)
+		    {
+		        String[] dataArray1 = dataRow.split(";");
+		        
+		        if(!dataArray1[2].equals(id)) {
+		        	String node2 = dataArray1[2];
+		        	String type = dataArray1[4];
+	        	
+		        	//if(!al.contains(node2)) {
+		        		al.add(node2);
+		        		al.add(type);
+		        	//}
+		        }
+		        
+	        	/*for (String item1:dataArray1)
+		        {
+		        	if(!item1.equals("r")) {
+		        		al1.add(item1);
+		        	}
+		        }*/
+
+		        dataRow = CSVFile.readLine();
+		    }
+
+		    CSVFile.close();
+			
+			return al;
+			
+		}
+	
+	// Compare les 2 fichiers et donne la liste des id des mots et du type de relation en communs
 	public static ArrayList<String> compare(ArrayList<String> al1, ArrayList<String> al2) throws IOException {
 		//Tableau des mots en communs
 		ArrayList<String> communs=new ArrayList<String>();
 	     
-	     for(String element:al1) {
+	     for(String element:al1) { //Pour chaque mot 
 	    	 if(al2.contains(element) && !communs.contains(element) && (al1.indexOf(element)%2 == 0)) { //Si le deuxième fichier contient aussi cet élément et que c'est bien un node2
 		    	 communs.add(element);
 		     }
@@ -215,7 +128,7 @@ public class Projet {
 	    	 
 	}
 	
-	public static ArrayList<String> significationMots(ArrayList<String> al, File f) throws IOException {
+	public static ArrayList<String> significationMots(ArrayList<String> alCommuns, File f) throws IOException {
 		//Trier le fichier pour avoir l'id des mots et leur sigification
 		ArrayList<String> mots = new ArrayList<String>();
 		
@@ -241,21 +154,54 @@ public class Projet {
 
 	     //System.out.println("Tableau des mots du premier fichier : " + mots);
 	     
-	     //Pour chaque mot de la liste, faire une autre liste avec leur traduction
+	     
+	     //Pour chaque mot de la liste des mots communs, faire une autre liste avec leur traduction
 	     ArrayList<String> alTrad = new ArrayList<String>();
 	     
-	     for(String el: al) {
-	    	 if(al.indexOf(el) != 0) {
+	     for(String el: alCommuns) {
+	    	 //if(alCommuns.indexOf(el) == 0) {
 	    		 int place = mots.indexOf(el);
 	    		 String trad = mots.get(place + 1);
 	    		 alTrad.add(trad);
-	    	 }
+	    	 //}
 	     }
-	     
+	     //System.out.println("Tableau des mots communs : " + alCommuns);
 	     //System.out.println("Traduction des mots communs : " + alTrad);
+	     //System.out.println("Taille de la liste de mots communs : " + alCommuns.size());
+	     //System.out.println("Taille de leur traduction : " + alTrad.size());
+
 	     
 	     return alTrad;
 	}
+	
+	
+	//Fonction qui trouve l'id d'un mot
+	public static String findID(File f) throws IOException {
+		
+		BufferedReader CSVFile = new BufferedReader(new FileReader(f));
+	    String dataRow = CSVFile.readLine();
+	    
+	    //On passe à la deuxième ligne parce que la première c'est l'entête
+	    dataRow = CSVFile.readLine();
+	    
+	    //On fait un tableau avec la première ligne
+	    String[] dataArray1 = dataRow.split(";");
+        
+        String id = dataArray1[1];
+	    
+		
+		CSVFile.close();
+		return id;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -272,43 +218,24 @@ public class Projet {
 		
 		System.out.println("~~ Fichiers du premier mot récupérés ~~");
 		
-		/* 2. Connaitre la relation voulu entre les deux mots */
 		
+		/* 2. Connaitre la relation voulu entre les deux mots */	
 		System.out.print("Donnez la relation parmis r_isa | r_has_part | r_holo : ");
 		String relation = in.readLine();
 		System.out.println(relation);
 		
-		/* 2. Récupérer les 2 fichiers csv du deuxième mot */
+		
+		/* 3. Récupérer les 2 fichiers csv du deuxième mot */
  		System.out.print("Donnez le deuxième mot: ");
  		String mot2 = in.readLine();
  		
  		File CSVFile2Rel = getFileRelation(mot2);
- 		//File CSVFile2Mot = getFileMot(mot2);
+ 		File CSVFile2Mot = getFileMot(mot2);
  		
 		System.out.println("~~ Fichiers du deuxième mot récupérés~~");
-
- 		
- 		/* 3. Tableau qui contient id du mot + numéro de relation pour chaque mot */
 		
 		
-		ArrayList<String> alMot1 = tri(CSVFile1Rel);
-		
-		System.out.println("Tableau du premier mot : " + alMot1);
-		
-	    ArrayList<String> alMot2 = tri(CSVFile2Rel);
-		
-	    System.out.println("Tableau du deuxième mot : " + alMot1);
-	    
-		/* 3. Trouver l'id des mots en communs aux deux fichiers */
-		
-		ArrayList<String> communs= compare(alMot1, alMot2);
-		
-		
-		/* 4. Trouver leur nom en français */
-		
-		ArrayList<String> trad = significationMots(communs, CSVFile1Mot);
-		
-		/* 5. La liste des relations avec leur nom */
+		/* 4. La liste des relations avec leur nom */
 		ArrayList<String> nomRel = new ArrayList<String>();
 		
 		nomRel.add(0,"r_associated");
@@ -336,32 +263,127 @@ public class Projet {
 		nomRel.add(22, "r_family");
 
 		int indexR = nomRel.indexOf(relation);
-		String indexRel = Integer.toString(indexR);
+		String RelID = Integer.toString(indexR);
 		
-		System.out.println("Le numéro de la relation est : " + indexRel);
+		System.out.println("Le numéro de la relation est : " + RelID);
 		
-		/* Dans le cas où la relation est r_isa */
+		/* 5. Récupérer l'id des mots */
+		
+		String id1 = findID(CSVFile1Mot);
+
+		System.out.println("Id du mot 1 : " + id1);
+		
+		String id2 = findID(CSVFile2Mot);
+
+		System.out.println("Id du mot 2 : " + id2);
+		
+		
+ 		/* 6. Tableau qui contient id du mot + numéro de relation pour chaque mot */
+		
+		ArrayList<String> alMot1 = tri1(CSVFile1Rel, id1);
+		
+		System.out.println("Tableau du premier mot : " + alMot1);
+		
+	    ArrayList<String> alMot2 = tri2(CSVFile2Rel, id2);
+		
+	    System.out.println("Tableau du deuxième mot : " + alMot2);
+	    
+	    //Test pour voir si toutes les occurence de 55488 sont dans le tableau du mot 2
+	    System.out.println("Le tableau contient le mot 55488: " + alMot2.contains("55488"));
+	    while(alMot2.contains("55488")) {
+	    	int index = alMot2.indexOf("55488");
+		    String num = alMot2.get(index + 1);
+		    System.out.println("num de la relation associé :" + num);
+		    alMot2.remove(index);
+	    }
+	    
+	    
+	    
+		/* 7. Trouver l'id des mots en communs aux deux fichiers */
+		
+		ArrayList<String> communs= compare(alMot1, alMot2);
+		
+		
+		/* 8. Création du tableau qui contient le nom des mots d'une liste en français */
+		
+		ArrayList<String> trad = significationMots(communs, CSVFile1Mot);
+		
+		/* 9. Créer un compteur pour pouvoir afficher le nombre de réponses */
+		
+		int compteurReponses = 0;
+		
+		System.out.println(mot1 + " " + relation + " " + mot2 + " :");
+		/* 10. Dans le cas où la relation est r_isa */
 		// pour avoir le type de relation on cherche l'index du mot dans le tableau de base et on fait +1)
 		
 		// Si le mot1 r_isa x et x r_isa mot2 alors mot1 r_isa mot2
 		
 		if(relation.equals("r_isa")) {
-			System.out.println("Je suis dans le if !");
-			for(String motCom:communs) {
-				int index1 = alMot1.indexOf(motCom);
-				int index2 = alMot2.indexOf(motCom);
-				String indexRel1 = alMot1.get(index1+1);
-				//System.out.println("Le type de la relation du mot 1 est : " + indexRel1);
-				String indexRel2 = alMot2.get(index2+1);
-				//System.out.println("Le type de la relation du mot 2 est : " + indexRel2);
+			
+			for(String motCom:communs) { //Pour chaque mot commun
+				//System.out.println("L'id du mot en commun est : " + motCom);
 				
-				if(indexRel1.equals(indexRel) && indexRel2.equals(indexRel)) {
-					int i = communs.indexOf(motCom);
-					String motTrad = trad.get(i);
-					System.out.println(mot1 + " " + relation + " " + mot2 + " car : " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+
+				//Pour avoir la traduction du mot en commun
+				int indexMotCom = communs.indexOf(motCom);
+				String motTrad = trad.get(indexMotCom);
+				//System.out.println("Le mot commun est : " + motTrad);
+	
+				
+				
+				int index1 = -1;
+				int index2 = -1;
+				
+				ArrayList<String> alMot2copie = new ArrayList<String>();
+				
+				while(alMot1.contains(motCom)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
+				
+					//On cherche l'index de ce mot commun dans le tableau du mot 1
+					index1 = alMot1.indexOf(motCom);
+					
+					
+					//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
+					alMot2copie = alMot2;
+					
+					while(alMot2copie.contains(motCom)) {
+						//On cherche l'index de ce mot commun dans le tableau du mot 2
+						index2 = alMot2.indexOf(motCom);
+						//System.out.println("Index du mot en commun dans le tableau du mot 1 : " + index1);
+						//System.out.println("Index du mot en commun dans le tableau du mot 2 : " + index2);
+						
+						
+						//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
+						String RelID1 = alMot1.get(index1+1);
+						String RelID2 = alMot2.get(index2+1);
+						//System.out.println("id de la relation avec le mot 1 : " + RelID1);
+						//System.out.println("id de la relation avec le mot 2 : " + RelID2);
+
+						/* 1ère manière : A r_isa B r_isa C */
+						if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+							compteurReponses++;
+							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+						}
+						
+						alMot2copie.set(index2, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
+					
+					}
+					
+					//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
+					alMot1.set(index1, "x");
+
 				}
+				
 			}
 			
+		}
+		
+		//Afficher le nombre de réponses
+		if (compteurReponses == 0) {
+			System.out.println("Il n'y a aucune réponse pour votre requête.");
+		} else if (compteurReponses == 1) {
+			System.out.println("Il y a une réponse.");
+		} else {
+			System.out.println("Il y a " + compteurReponses + " réponses.");
 		}
      
 	}

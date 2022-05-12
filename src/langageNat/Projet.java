@@ -220,7 +220,7 @@ public class Projet {
 		
 		
 		/* 2. Connaitre la relation voulu entre les deux mots */	
-		System.out.print("Donnez la relation parmis r_isa | r_has_part | r_holo : ");
+		System.out.print("Donnez la relation parmis r_isa | r_carac | r_agent-1 : ");
 		String relation = in.readLine();
 		System.out.println(relation);
 		
@@ -261,7 +261,9 @@ public class Projet {
 		nomRel.add(20, "r_has_magn");
 		nomRel.add(21, "r_has_antimagn");
 		nomRel.add(22, "r_family");
-
+		nomRel.add(17, "r_carac-1");
+		nomRel.add(24, "r_agent-1");
+		
 		int indexR = nomRel.indexOf(relation);
 		String RelID = Integer.toString(indexR);
 		
@@ -289,13 +291,13 @@ public class Projet {
 	    System.out.println("Tableau du deuxième mot : " + alMot2);
 	    
 	    //Test pour voir si toutes les occurence de 55488 sont dans le tableau du mot 2
-	    System.out.println("Le tableau contient le mot 55488: " + alMot2.contains("55488"));
+	    /*System.out.println("Le tableau contient le mot 55488: " + alMot2.contains("55488"));
 	    while(alMot2.contains("55488")) {
 	    	int index = alMot2.indexOf("55488");
 		    String num = alMot2.get(index + 1);
 		    System.out.println("num de la relation associé :" + num);
 		    alMot2.remove(index);
-	    }
+	    }*/
 	    
 	    
 	    
@@ -376,6 +378,125 @@ public class Projet {
 			}
 			
 		}
+		
+		if(relation.equals("r_carac")) {
+			
+			for(String motCom:communs) { //Pour chaque mot commun
+				//System.out.println("L'id du mot en commun est : " + motCom);
+				
+
+				//Pour avoir la traduction du mot en commun
+				int indexMotCom = communs.indexOf(motCom);
+				String motTrad = trad.get(indexMotCom);
+				//System.out.println("Le mot commun est : " + motTrad);
+	
+				
+				
+				int index1 = -1;
+				int index2 = -1;
+				
+				ArrayList<String> alMot2copie = new ArrayList<String>();
+				
+				while(alMot1.contains(motCom)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
+				
+					//On cherche l'index de ce mot commun dans le tableau du mot 1
+					index1 = alMot1.indexOf(motCom);
+					
+					
+					//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
+					alMot2copie = alMot2;
+					
+					while(alMot2copie.contains(motCom)) {
+						//On cherche l'index de ce mot commun dans le tableau du mot 2
+						index2 = alMot2.indexOf(motCom);
+						//System.out.println("Index du mot en commun dans le tableau du mot 1 : " + index1);
+						//System.out.println("Index du mot en commun dans le tableau du mot 2 : " + index2);
+						
+						
+						//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
+						String RelID1 = alMot1.get(index1+1);
+						String RelID2 = alMot2.get(index2+1);
+						//System.out.println("id de la relation avec le mot 1 : " + RelID1);
+						//System.out.println("id de la relation avec le mot 2 : " + RelID2);
+
+						/* 1ère manière : A r_isa B r_carac C */
+						if(RelID1.equals("6") && RelID2.equals(RelID)) {
+							compteurReponses++;
+							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+						}
+						
+						alMot2copie.set(index2, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
+					
+					}
+					
+					//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
+					alMot1.set(index1, "x");
+
+				}
+				
+			}
+			
+		}
+		
+		if(relation.equals("r_agent-1")) {
+			
+			for(String motCom:communs) { //Pour chaque mot commun
+				//System.out.println("L'id du mot en commun est : " + motCom);
+				
+
+				//Pour avoir la traduction du mot en commun
+				int indexMotCom = communs.indexOf(motCom);
+				String motTrad = trad.get(indexMotCom);
+				//System.out.println("Le mot commun est : " + motTrad);
+	
+				
+				
+				int index1 = -1;
+				int index2 = -1;
+				
+				ArrayList<String> alMot2copie = new ArrayList<String>();
+				
+				while(alMot1.contains(motCom)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
+				
+					//On cherche l'index de ce mot commun dans le tableau du mot 1
+					index1 = alMot1.indexOf(motCom);
+					
+					
+					//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
+					alMot2copie = alMot2;
+					
+					while(alMot2copie.contains(motCom)) {
+						//On cherche l'index de ce mot commun dans le tableau du mot 2
+						index2 = alMot2.indexOf(motCom);
+						//System.out.println("Index du mot en commun dans le tableau du mot 1 : " + index1);
+						//System.out.println("Index du mot en commun dans le tableau du mot 2 : " + index2);
+						
+						
+						//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
+						String RelID1 = alMot1.get(index1+1);
+						String RelID2 = alMot2.get(index2+1);
+						//System.out.println("id de la relation avec le mot 1 : " + RelID1);
+						//System.out.println("id de la relation avec le mot 2 : " + RelID2);
+
+						/* 1ère manière : A r_agent-1 B r_isa C */
+						if(RelID1.equals("6") && RelID2.equals(RelID)) {
+							compteurReponses++;
+							System.out.println(" -> " + mot1 + " r_isa " + motTrad + " " + relation + " " + mot2);
+						}
+						
+						alMot2copie.set(index2, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
+					
+					}
+					
+					//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
+					alMot1.set(index1, "x");
+
+				}
+				
+			}
+			
+		}
+
 		
 		//Afficher le nombre de réponses
 		if (compteurReponses == 0) {

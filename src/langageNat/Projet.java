@@ -171,11 +171,202 @@ public class Projet {
 		
 	}
 	
-	public static int analyse(ArrayList<String> nomRel, ArrayList<String> communs, ArrayList<String> trad, ArrayList<String> alMot1, ArrayList<String> alMot2, String relation, int compteurReponses, String mot1, String mot2, boolean fromRelationback) {
+	public static int analyseback(ArrayList<String> nomRel, String relation, File CSVFile1Rel, File CSVFile2Rel, File CSVFile2Mot, String id1, String id2, int compteurReponses, String mot1, String mot2) throws IOException {
 		
+		//System.out.println("Je suis dans l'analyse back");
+		ArrayList<String> alMot1 = tri(CSVFile2Rel, id2, 1);
 		
+		//System.out.println("Tableau du premier mot : " + alMot1);
+		
+	    ArrayList<String> alMot2 = tri(CSVFile1Rel, id1, 2);
+		
+	    //System.out.println("Tableau du deuxième mot : " + alMot2);
+	    
+	    ArrayList<String> communs = compare(alMot1, alMot2);
+	    
+	    ArrayList<String> trad = significationMots(communs, CSVFile2Mot);
+	    
+	    int indexR = nomRel.indexOf(relation);
+		String RelID = Integer.toString(indexR);
+		
+		for(String motCom:communs) { //Pour chaque mot commun
+			//System.out.println("L'id du mot en commun est : " + motCom);
+
+
+			if(compteurReponses < 50) {
+				//Pour avoir la traduction du mot en commun
+				int indexMotCom = communs.indexOf(motCom);
+				String motTrad = trad.get(indexMotCom);
+				//System.out.println("Le mot commun est : " + motTrad);
+
+
+
+				int index1 = -1;
+				int index2 = -1;
+
+				ArrayList<String> alMot2copie = new ArrayList<String>();
+
+				
+				while(alMot1.contains(motCom)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
+
+					//On cherche l'index de ce mot commun dans le tableau du mot 1
+					index1 = alMot1.indexOf(motCom);
+
+
+					//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
+					alMot2copie = alMot2;
+
+					while(alMot2copie.contains(motCom)) {
+						//On cherche l'index de ce mot commun dans le tableau du mot 2
+						index2 = alMot2.indexOf(motCom);
+						//System.out.println("Index du mot en commun dans le tableau du mot 1 : " + index1);
+						//System.out.println("Index du mot en commun dans le tableau du mot 2 : " + index2);
+
+
+						//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
+						String RelID1 = alMot1.get(index1+1);
+						String RelID2 = alMot2.get(index2+1);
+						//System.out.println("id de la relation avec le mot 1 : " + RelID1);
+						//System.out.println("id de la relation avec le mot 2 : " + RelID2);
+					
+
+
+						if(relation.equals("r_isa")) {
+							/* 1ère manière : A r_isa B r_isa C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+							/* 2ème manière : A r_holo B r_isa C (inférence )
+							if(RelID1.equals("10") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_holo " + motTrad + " " + relation + " " + mot2);
+							}*/
+
+						}
+						
+						if(relation.equals("r_holo")) {
+							/* 1ère manière : A r_holo B r_holo C */
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+
+						}
+						
+						if(relation.equals("r_hypo")) {
+							/* 1ère manière : A r_holo B r_holo C */
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + "r_isa " + motTrad + " " + relation + " " + mot2);
+							}
+
+						}
+
+
+						if(relation.equals("r_carac")) {
+							/* 1ère manière : A r_isa B r_carac C */
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_isa " + motTrad + " " + relation + " " + mot2);
+							}
+
+						}
+						
+						if(relation.equals("r_carac-1")) {
+							/* 1ère manière : A r_isa B r_carac C */
+							if(RelID1.equals(RelID) && RelID2.equals("6")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " r_isa " + mot2);
+							}
+
+						}
+						
+						if(relation.equals("r_agent")) {
+							/* 1ère manière : A r_agent B r_isa C (inférence déductive) */
+							if(RelID1.equals(RelID) && RelID2.equals("6")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " r_isa " + mot2);
+							}
+									
+						}
+
+						if(relation.equals("r_agent-1")) {
+							/* 1ère manière : A r_isa B r_agent-1 C (inférence déductive) */
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_isa " + motTrad + " " + relation + " " + mot2);
+							}
+
+						}
+
+						if(relation.equals("r_patient")) {
+							/* 1ère manière : A r_patient B r_isa C (inférence déductive) */
+							if(RelID1.equals(RelID) && RelID2.equals("6")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad +  " r_isa " + mot2);
+							}
+
+						}
+						
+						if(relation.equals("r_patient-1")) {
+							/* 1ère manière : A r_patient B r_isa C (inférence déductive) */
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_isa " + motTrad +  " " + relation + " " + mot2);
+							}
+
+						}
+						
+						if(relation.equals("r_lieu")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+
+							
+						}
+						
+						if(relation.equals("r_lieu-1")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+						}
+						
+						if(relation.equals("r_domain")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+						}
+						
+						alMot2copie.set(index2, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
+
+					}
+
+					//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
+					alMot1.set(index1, "x");
+
+				}
+			}
+			
+
+		}
 		
 		return compteurReponses;
+		
 	}
 	
 	
@@ -207,10 +398,11 @@ public class Projet {
 		
 		/* 2. Connaitre la relation voulu entre les deux mots */	
 		System.out.println("Donnez la relation parmis");
-		System.out.print("r_isa | r_carac | r_agent-1 | r_patient | r_lieu | r_holo | r_agent : ");
+		System.out.println(" r_isa |  r_carac  |  r_agent  |  r_patient  |  r_lieu  |  r_domain | r_holo | r_can_eat");
+		System.out.print("r_hypo | r_carac-1 | r_agent-1 | r_patient-1 | r_lieu-1 | r_domain-1 : ");
 
 		String relation = in.readLine();
-		if(!(relation.equals("r_isa") || relation.equals("r_carac") || relation.equals("r_agent-1") || relation.equals("r_patient") || relation.equals("r_lieu") || relation.equals("r_lieu-1") || relation.equals("r_holo") || relation.equals("r_agent"))) {
+		if(!(relation.equals("r_isa") || relation.equals("r_hypo") || relation.equals("r_carac") || relation.equals("r_carac-1") || relation.equals("r_agent-1") || relation.equals("r_patient") || relation.equals("r_patient-1") || relation.equals("r_lieu") || relation.equals("r_lieu-1") || relation.equals("r_holo") || relation.equals("r_agent") || relation.equals("r_domain") || relation.equals("r_domain-1") || relation.equals("r_can_eat"))) {
 			System.out.println("Choisissez une relation parmis la liste précédente !");
 			System.exit(-1); //On sort du programme
 		}
@@ -266,6 +458,80 @@ public class Projet {
 		nomRel.add(26, "r_patient-1");
 		nomRel.add(27, "r_domain-1");
 		nomRel.add(28, "r_lieu-1");
+		nomRel.add(29, "x");
+		nomRel.add(30, "x");
+		nomRel.add(31, "x");
+		nomRel.add(32, "x");
+		nomRel.add(33, "x");
+		nomRel.add(34, "x");
+		nomRel.add(35, "x");
+		nomRel.add(36, "x");
+		nomRel.add(37, "x");
+		nomRel.add(38, "x");
+		nomRel.add(39, "x");
+		nomRel.add(40, "x");
+		nomRel.add(41, "x");
+		nomRel.add(42, "x");
+		nomRel.add(43, "x");
+		nomRel.add(44, "x");
+		nomRel.add(45, "x");
+		nomRel.add(46, "x");
+		nomRel.add(47, "x");
+		nomRel.add(48, "x");
+		nomRel.add(49, "x");
+		nomRel.add(50, "x");
+		nomRel.add(51, "x");
+		nomRel.add(52, "x");
+		nomRel.add(53, "x");
+		nomRel.add(54, "x");
+		nomRel.add(55, "x");
+		nomRel.add(56, "x");
+		nomRel.add(57, "x");
+		nomRel.add(58, "x");
+		nomRel.add(59, "x");
+		nomRel.add(60, "x");
+		nomRel.add(61, "x");
+		nomRel.add(62, "x");
+		nomRel.add(63, "x");
+		nomRel.add(64, "x");
+		nomRel.add(65, "x");
+		nomRel.add(66, "x");
+		nomRel.add(67, "x");
+		nomRel.add(68, "x");
+		nomRel.add(69, "x");
+		nomRel.add(70, "x");
+		nomRel.add(71, "x");
+		nomRel.add(72, "x");
+		nomRel.add(73, "x");
+		nomRel.add(74, "x");
+		nomRel.add(75, "x");
+		nomRel.add(76, "x");
+		nomRel.add(77, "x");
+		nomRel.add(78, "x");
+		nomRel.add(79, "x");
+		nomRel.add(80, "x");
+		nomRel.add(81, "x");
+		nomRel.add(82, "x");
+		nomRel.add(83, "x");
+		nomRel.add(84, "x");
+		nomRel.add(85, "x");
+		nomRel.add(86, "x");
+		nomRel.add(87, "x");
+		nomRel.add(88, "x");
+		nomRel.add(89, "x");
+		nomRel.add(90, "x");
+		nomRel.add(91, "x");
+		nomRel.add(92, "x");
+		nomRel.add(93, "x");
+		nomRel.add(94, "x");
+		nomRel.add(95, "x");
+		nomRel.add(96, "x");
+		nomRel.add(97, "x");
+		nomRel.add(98, "x");
+		nomRel.add(99, "x");
+		nomRel.add(100, "x");
+		nomRel.add(101, "x");
+		nomRel.add(102, "r_can_eat");
 		
 		/*
 		int indexR = nomRel.indexOf(relation);
@@ -297,13 +563,7 @@ public class Projet {
 		
 	    //System.out.println("Tableau du deuxième mot : " + alMot2);
 	    
-	    ArrayList<String> alMot1back = tri(CSVFile1Rel, id1, 2);
-		
-		//System.out.println("Tableau du premier mot : " + alMot1);
-		
-	    ArrayList<String> alMot2back = tri(CSVFile2Rel, id2, 1);
-		
-	    //System.out.println("Tableau du deuxième mot : " + alMot2);
+	    
 	    
 	    
 	    
@@ -311,7 +571,7 @@ public class Projet {
 		
 		ArrayList<String> communs= compare(alMot1, alMot2);
 		
-		ArrayList<String> communsback = compare(alMot2back, alMot1back);
+		
 		
 		
 		
@@ -319,7 +579,7 @@ public class Projet {
 		
 		ArrayList<String> trad = significationMots(communs, CSVFile1Mot);
 		
-		ArrayList<String> tradback = significationMots(communs, CSVFile1Mot);
+		
 		
 		
 		/* 9. Créer un compteur pour pouvoir afficher le nombre de réponses */
@@ -346,250 +606,240 @@ public class Projet {
 		for(String motCom:communs) { //Pour chaque mot commun
 			//System.out.println("L'id du mot en commun est : " + motCom);
 
-
-			//Pour avoir la traduction du mot en commun
-			int indexMotCom = communs.indexOf(motCom);
-			String motTrad = trad.get(indexMotCom);
-			//System.out.println("Le mot commun est : " + motTrad);
-
-
-
-			int index1 = -1;
-			int index2 = -1;
-
-			ArrayList<String> alMot2copie = new ArrayList<String>();
-
-			while(alMot1.contains(motCom)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
-
-				//On cherche l'index de ce mot commun dans le tableau du mot 1
-				index1 = alMot1.indexOf(motCom);
+			if(compteurReponses < 25) {
+				//Pour avoir la traduction du mot en commun
+				int indexMotCom = communs.indexOf(motCom);
+				String motTrad = trad.get(indexMotCom);
+				//System.out.println("Le mot commun est : " + motTrad);
 
 
-				//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
-				alMot2copie = alMot2;
 
-				while(alMot2copie.contains(motCom)) {
-					//On cherche l'index de ce mot commun dans le tableau du mot 2
-					index2 = alMot2.indexOf(motCom);
-					//System.out.println("Index du mot en commun dans le tableau du mot 1 : " + index1);
-					//System.out.println("Index du mot en commun dans le tableau du mot 2 : " + index2);
+				int index1 = -1;
+				int index2 = -1;
 
+				ArrayList<String> alMot2copie = new ArrayList<String>();
 
-					//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
-					String RelID1 = alMot1.get(index1+1);
-					String RelID2 = alMot2.get(index2+1);
-					//System.out.println("id de la relation avec le mot 1 : " + RelID1);
-					//System.out.println("id de la relation avec le mot 2 : " + RelID2);
-				
+				while(alMot1.contains(motCom)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
+
+					//On cherche l'index de ce mot commun dans le tableau du mot 1
+					index1 = alMot1.indexOf(motCom);
 
 
-					if(relation.equals("r_isa")) {
-						/* 1ère manière : A r_isa B r_isa C (inférence transitive)*/
-						if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
-						}
-						
-						/* 2ème manière : A r_holo B r_isa C (inférence )*/
-						if(RelID1.equals("10") && RelID2.equals(RelID)) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " r_holo " + motTrad + " " + relation + " " + mot2);
-						}
+					//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
+					alMot2copie = alMot2;
 
-					}
+					while(alMot2copie.contains(motCom)) {
+						//On cherche l'index de ce mot commun dans le tableau du mot 2
+						index2 = alMot2.indexOf(motCom);
+						//System.out.println("Index du mot en commun dans le tableau du mot 1 : " + index1);
+						//System.out.println("Index du mot en commun dans le tableau du mot 2 : " + index2);
 
 
-					if(relation.equals("r_carac")) {
-						/* 1ère manière : A r_isa B r_carac C */
-						if(RelID1.equals("6") && RelID2.equals(RelID)) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " r_isa " + motTrad + " " + relation + " " + mot2);
-						}
-
-					}
+						//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
+						String RelID1 = alMot1.get(index1+1);
+						String RelID2 = alMot2.get(index2+1);
+						//System.out.println("id de la relation avec le mot 1 : " + RelID1);
+						//System.out.println("id de la relation avec le mot 2 : " + RelID2);
 					
-					if(relation.equals("r_agent")) {
-						/* 1ère manière : A r_agent B r_isa C (inférence déductive) */
-						if(RelID1.equals(RelID) && RelID2.equals("6")) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " r_isa " + mot2);
+
+
+						if(relation.equals("r_isa")) {
+							/* 1ère manière : A r_isa B r_isa C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+							/* 2ème manière : A r_holo B r_isa C (inférence )
+							if(RelID1.equals("10") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_holo " + motTrad + " " + relation + " " + mot2);
+							}*/
+
 						}
 						
-						String relationback = "r_agent-1";
-						for(String motComback:communsback) { //Pour chaque mot commun avec la relation inverse
-
-							//Pour avoir la traduction du mot en commun
-							int indexMotComback = communsback.indexOf(motComback);
-							String motTradback = tradback.get(indexMotComback);
-
-							int index1back = -1;
-							int index2back = -1;
-
-							ArrayList<String> alMot1copieback = new ArrayList<String>();
-
-							while(alMot2back.contains(motComback)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
-
-								//On cherche l'index de ce mot commun dans le tableau du mot 1
-								index2back = alMot2back.indexOf(motComback);
-
-
-								//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
-								alMot1copieback = alMot1back;
-
-								while(alMot1copieback.contains(motComback)) {
-									//On cherche l'index de ce mot commun dans le tableau du mot 2
-									index1back = alMot1back.indexOf(motComback);
-							
-
-									//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
-									String RelID1back = alMot1back.get(index1back+1);
-									String RelID2back = alMot2back.get(index2back+1);
-									
-									
-									/* 1ère manière : A r_isa B r_agent-1 C (inférence déductive) */
-									if(RelID1back.equals("6") && RelID2back.equals(RelID)) {
-										compteurReponses++;
-										System.out.println(" -> " + mot2 + " r_isa " + motTradback + " " + relationback + " " + mot1);
-									}
-								}
-									
-								alMot1copieback.set(index1back, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
-
+						if(relation.equals("r_holo")) {
+							/* 1ère manière : A r_holo B r_holo C */
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
 							}
 
-							//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
-							alMot2back.set(index2back, "x");
-
-						}
-					
-						
-						/*
-						if(fromRelationback == false) {
-							compteurReponses = analyse(communsback, trad, alMot1back, alMot2back, "r_agent-1", RelID, compteurReponses, mot1, mot2);
-						}*/
-								
-					}
-
-					if(relation.equals("r_agent-1")) {
-						/* 1ère manière : A r_isa B r_agent-1 C (inférence déductive) */
-						if(RelID1.equals("6") && RelID2.equals(RelID)) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " r_isa " + motTrad + " " + relation + " " + mot2);
 						}
 						
-						String relationback = "r_agent";
-						String RelIDback = "13";
-						for(String motComback:communsback) { //Pour chaque mot commun avec la relation inverse
-
-							//Pour avoir la traduction du mot en commun
-							int indexMotComback = communsback.indexOf(motComback);
-							String motTradback = tradback.get(indexMotComback);
-
-							int index1back = -1;
-							int index2back = -1;
-
-							ArrayList<String> alMot1copieback = new ArrayList<String>();
-
-							while(alMot2back.contains(motComback)) { //Tant qu'il y a des occurences du mot en commun dans la liste des mots 1
-
-								//On cherche l'index de ce mot commun dans le tableau du mot 1
-								index2back = alMot2back.indexOf(motComback);
-
-
-								//On crée une copie de la liste du mot 2 pour pouvoir la réinitialiser à chaque tour
-								alMot1copieback = alMot1back;
-
-								while(alMot1copieback.contains(motComback)) {
-									//On cherche l'index de ce mot commun dans le tableau du mot 2
-									index1back = alMot1back.indexOf(motComback);
-							
-
-									//On regarde le type de relation que le mot en commun a avec les mots 1 et 2
-									String RelID2back = alMot2back.get(index2back+1);
-									String RelID1back = alMot1back.get(index1back+1);
-									
-									if(relationback.equals("r_agent")) {
-										/* 1ère manière : A r_isa B r_agent-1 C (inférence déductive) */
-										if(RelID2back.equals(RelIDback) && RelID1back.equals("6")) {
-											compteurReponses++;
-											System.out.println(" -> " + mot2 + " " + relationback + " " + motTradback + " r_isa " + mot1);
-										}
-										
-								
-									}
-									
-									alMot1copieback.set(index1back, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
-
-								}
-
-								//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
-								alMot2back.set(index2back, "x");
-
+						if(relation.equals("r_hypo")) {
+							/* 1ère manière : A r_holo B r_holo C */
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
 							}
+							
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + "r_isa " + motTrad + " " + relation + " " + mot2);
+							}
+
+						}
+
+
+						if(relation.equals("r_carac")) {
+							/* 1ère manière : A r_isa B r_carac C */
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_isa " + motTrad + " " + relation + " " + mot2);
+							}
+
 						}
 						
-						/*
-						if(RelID2back.equals("13")) {
-							compteurReponses++;
-							System.out.println(" -> " + mot2 + " r_agent " + mot1);
+						if(relation.equals("r_carac-1")) {
+							/* 1ère manière : A r_isa B r_carac C */
+							if(RelID1.equals(RelID) && RelID2.equals("6")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " r_isa " + mot2);
+							}
+
 						}
 						
-						if(RelID2back.equals("13") && RelID1.equals("6")) {
-							compteurReponses++;
-							System.out.println(" -> " + mot2 + " r_agent " + motTrad + " r_isa " + mot1);
-						}*/
+						if(relation.equals("r_agent")) {
+							/* 1ère manière : A r_agent B r_isa C (inférence déductive) */
+							if(RelID1.equals(RelID) && RelID2.equals("6")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " r_isa " + mot2);
+							}
+									
+						}
+
+						if(relation.equals("r_agent-1")) {
+							/* 1ère manière : A r_isa B r_agent-1 C (inférence déductive) */
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_isa " + motTrad + " " + relation + " " + mot2);
+							}
+
+						}
+
+						if(relation.equals("r_patient")) {
+							/* 1ère manière : A r_patient B r_isa C (inférence déductive) */
+							if(RelID1.equals(RelID) && RelID2.equals("6")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad +  " r_isa " + mot2);
+							}
+
+						}
+						
+						if(relation.equals("r_patient-1")) {
+							/* 1ère manière : A r_patient B r_isa C (inférence déductive) */
+							if(RelID1.equals("6") && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " r_isa " + motTrad +  " " + relation + " " + mot2);
+							}
+
+						}
+						
+						if(relation.equals("r_lieu")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+
+							
+						}
+						
+						if(relation.equals("r_lieu-1")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+						}
+						
+						if(relation.equals("r_domain")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+						}
+						
+						if(relation.equals("r_domain-1")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
+							}
+							
+						}
+						
+						if(relation.equals("r_can_eat")) {
+							/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
+							if(RelID1.equals(RelID) && RelID2.equals("6")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " r_isa " + mot2);
+							}
+							
+							if(RelID1.equals(RelID) && RelID2.equals("8")) {
+								compteurReponses++;
+								System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " r_hypo " + mot2);
+							}
+							
+						}
+						
+						
+						alMot2copie.set(index2, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
 
 					}
 
-					if(relation.equals("r_patient")) {
-						/* 1ère manière : A r_patient B r_isa C (inférence déductive) */
-						if(RelID1.equals(RelID) && RelID2.equals("6")) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad +  " r_isa " + mot2);
-						}
-
-					}
-					
-					if(relation.equals("r_lieu")) {
-						/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
-						if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
-						}
-
-						
-					}
-					
-					if(relation.equals("r_lieu-1")) {
-						/* 1ère manière : A r_lieu B r_lieu C (inférence transitive)*/
-						if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
-						}
-						
-					}
-					
-					if(relation.equals("r_holo")) {
-						/* 1ère manière : A r_holo B r_holo C */
-						if(RelID1.equals(RelID) && RelID2.equals(RelID)) {
-							compteurReponses++;
-							System.out.println(" -> " + mot1 + " " + relation + " " + motTrad + " " + relation + " " + mot2);
-						}
-						
-						
-
-					}
-					
-					
-					alMot2copie.set(index2, "x"); //On remplace le mot par un x pour qu'il ne le prenne plus en compte
+					//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
+					alMot1.set(index1, "x");
 
 				}
-
-				//On supprime le mot de la liste pour voir s'il y en a d'autre d'identique
-				alMot1.set(index1, "x");
-
 			}
 
+			
+
+		}
+		
+		if(relation.equals("r_agent")) {
+			compteurReponses = analyseback(nomRel, "r_agent-1", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_agent-1")) {
+			compteurReponses = analyseback(nomRel, "r_agent", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_lieu")) {
+			compteurReponses = analyseback(nomRel, "r_lieu-1", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_lieu-1")) {
+			compteurReponses = analyseback(nomRel, "r_lieu", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_hypo")) {
+			compteurReponses = analyseback(nomRel, "r_isa", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_isa")) {
+			compteurReponses = analyseback(nomRel, "r_hypo", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_carac")) {
+			compteurReponses = analyseback(nomRel, "r_carac-1", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_carac-1")) {
+			compteurReponses = analyseback(nomRel, "r_carac", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_patient-1")) {
+			compteurReponses = analyseback(nomRel, "r_patient", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
+		}
+		
+		if(relation.equals("r_patient")) {
+			compteurReponses = analyseback(nomRel, "r_patient-1", CSVFile1Rel, CSVFile2Rel, CSVFile2Mot, id1, id2, compteurReponses, mot2, mot1);
 		}
 
 		System.out.println("      ");
